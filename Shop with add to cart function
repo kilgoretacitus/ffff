@@ -1,0 +1,220 @@
+App.jss
+
+import logo from './logo.svg';
+import './App.css';
+import { BrowserRouter, Route ,Routes} from 'react-router-dom';
+import Home from './components/Home';
+import Detailed from './components/Detailed';
+import { Provider } from 'react-redux';
+import store from './store'
+import Cart from './components/Cart';
+
+function App() {
+  return (
+    <Provider store={store}>
+    <BrowserRouter>
+    <Routes>
+      <Route path='/' element={<Home/>}/>
+      <Route path='/detailed/:id' element={<Detailed/>} />
+      <Route path='/cart' element={<Cart/>} />
+    </Routes>
+    </BrowserRouter>
+    </Provider>
+  );
+}
+
+export default App;
+
+axiosFunctions.js
+
+import axios from "axios"
+
+export default class AxiosFunctions{
+    getProducts(){
+        return axios.get('https://dummyjson.com/products')
+    }
+
+    getFilteredProducts(id){
+        return axios.get(`https://dummyjson.com/products/${id}`)
+    }
+}
+
+Cart.js 
+
+import React from 'react'
+import { useSelector } from 'react-redux'
+import { getProductForCart } from '../localstore/localstore'
+import { Link } from 'react-router-dom'
+import Home from './Home'
+
+function Cart() {
+    const cartProduct = useSelector(getProductForCart)
+
+  return (
+    <div>
+      {
+        cartProduct.length>0&&(
+            cartProduct.map((obj,i)=>
+            <div key={i}>
+                <img src={obj.thumbnail} />
+                <h1>{obj.title}</h1>
+                 </div>
+            )
+        )
+      }
+      <Link to={'/'} element={<Home/>}>Home</Link>
+    </div>
+  )
+}
+
+export default Cart
+
+Detailed.js
+
+import React, { useEffect, useState } from 'react'
+import AxiosFunctions from '../axiosFunctions/axiosFunctions'
+import { Link, useParams } from 'react-router-dom'
+import Cart from './Cart'
+import {useDispatch, useSelector} from "react-redux"
+import { getProductForCart, setProductForCart } from '../localstore/localstore'
+
+
+
+const axiosFunctions = new AxiosFunctions()
+
+function Detailed() {
+
+    const [allProducts, setAllProducts] = useState(null)
+    const[product,setProduct] = useState(null)
+    const {id} = useParams()
+    const dispatch = useDispatch()
+    const all = useSelector(getProductForCart)
+
+
+
+    useEffect(()=>{
+        setProduct(null)
+        axiosFunctions.getFilteredProducts(id).then(response =>{
+            setProduct(response.data)
+        })
+        console.log(all)
+    },[])
+    
+
+  
+    function addToCart(){
+        
+        let tempArr = []
+        if(all.length>0){
+            tempArr.push(...all)
+        }
+        
+        
+        tempArr.push(product)
+        dispatch(setProductForCart(tempArr))
+        console.log(tempArr)
+    }
+
+
+  return (
+    <div>
+      {
+        product &&(
+            <div>
+                <img src={product.thumbnail} />
+                <h1>{product.title}</h1>
+                <button onClick={addToCart}>Add to Cart</button>
+            </div>
+        )
+      }
+      <Link to='/cart' element={<Cart/>} >Cart</Link>
+    </div>
+  )
+}
+
+export default Detailed
+
+Home.js
+
+import React, { useEffect, useState } from 'react'
+import AxiosFunctions from '../axiosFunctions/axiosFunctions'
+import {Link} from "react-router-dom"
+import Detailed from './Detailed';
+
+
+const axiosFunctions = new AxiosFunctions();
+
+function Home() {
+
+    const [data,setData] = useState(null)
+
+    useEffect(()=>{
+        axiosFunctions.getProducts().then(response =>{
+            setData(response.data)
+        })
+
+        console.log(data)
+    },[])
+
+
+  return (
+    <div>
+      {
+        data && (
+            <div>
+                {
+                    data.products.map((obj,i)=>(
+                        <div key={i}>
+                            <Link to={`/detailed/${obj.id}`}  element={<Detailed/>}>
+                            <img src={obj.thumbnail} />
+                            <h1>{obj.title}</h1>
+                            </Link>
+
+                        </div>
+                    ))
+                }
+            </div>
+        )
+      }
+    </div>
+  )
+}
+
+export default Home
+
+localstore.js
+
+import {createSlice} from "@reduxjs/toolkit"
+
+const initialState={
+
+    //აქ აღიწერება ცვლადები
+    productForCart:[],
+}
+
+export const functions=createSlice({
+    name:"MyLocalStore",
+    initialState,
+    reducers:{
+        setProductForCart:(state,action)=>{
+            state.productForCart=action.payload
+        }
+
+        //აქ აღიწერება სეთერები
+    }
+})
+
+export const{
+    setProductForCart,
+    //აქ აღიწერება action-ის სახელწოდება
+}=functions.actions
+
+
+export const getProductForCart=(state)=>state.functions.productForCart
+
+
+export default functions.reducer
+
+
+
+
