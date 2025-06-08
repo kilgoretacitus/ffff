@@ -1,0 +1,125 @@
+App.js
+
+import React, { useState } from 'react';
+import './App.css';
+import Movie from './Movie'; 
+
+const App = () => {
+  const [movies, setMovies] = useState([
+    { id: 1, name: 'TOP GUN', length: '2 Hours 15 Minutes' },
+    { id: 2, name: 'Star Wars', length: '5 Hours 17 Minutes' },
+    { id: 3, name: 'The Lord of The Rings', length: '4 Hours 33 Minutes' },
+  ]);
+
+  const deleteMovie = (id) => {
+    setMovies(movies.filter(movie => movie.id !== id));
+  };
+
+  return (
+    <div className="container">
+      <div className="movie-container">
+        <h1>Movies</h1>
+        <div className="movie-list">
+          {movies.map(movie => (
+            <Movie key={movie.id} movie={movie} deleteMovie={deleteMovie} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+
+Movie.js
+
+import React from 'react';
+
+const Movie = ({ movie, deleteMovie }) => {
+  return (
+    <div className="movie-item">
+      <div>
+        <h2>{movie.name}</h2>
+        <p>{movie.length}</p>
+      </div>
+      <button className="delete-button" onClick={() => deleteMovie(movie.id)}>
+        X
+      </button>
+    </div>
+  );
+};
+
+export default Movie;
+
+report
+
+
+App.cs
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+}
+
+.movie-container {
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 800px;
+  border: 3px solid black;
+}
+
+h1 {
+  font-size: 2em;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.movie-list {
+  list-style: none;
+  padding: 0;
+}
+
+.movie-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f0f0f0; 
+}
+
+.delete-button {
+  background: none;
+  color: red;
+  border: none;
+  font-size: 2em;
+  cursor: pointer;
+  padding: 0;
+  display: inline;
+}
+
+.delete-button:hover {
+  color: darkred;
+}
+
+@media (max-width: 320px) {
+  .movie-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .delete-button {
+    align-self: flex-end;
+    margin-top: 10px;
+  }
+}
+
