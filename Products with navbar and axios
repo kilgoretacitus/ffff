@@ -1,0 +1,220 @@
+App.js
+
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+import Home from './components/Home';
+import Products from './components/Products';
+import ProductDetails from './components/ProductDetails';
+import NotFound from './components/NotFound';
+
+const App = () => {
+  return (
+    <Router>
+      <div>
+        <nav style={{ backgroundColor: 'blue', padding: '10px' }}>
+          <ul style={{ display: 'flex', listStyleType: 'none', padding: '0' }}>
+            <li style={{ marginRight: '20px' }}>
+              <NavLink
+                to="/"
+                style={({ isActive }) => ({
+                  color: isActive ? 'white' : 'lightgray',
+                  textDecoration: 'none',
+                  fontWeight: 'bold',
+                })}
+              >
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/products"
+                style={({ isActive }) => ({
+                  color: isActive ? 'white' : 'lightgray',
+                  textDecoration: 'none',
+                  fontWeight: 'bold',
+                })}
+              >
+                Products
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:id" element={<ProductDetails />} />
+          <Route path="*" element={<NotFound />} /> 
+        </Routes>
+      </div>
+    </Router>
+  );
+};
+
+export default App;
+
+
+
+axiosfunctions.js
+
+import axios from "axios"
+
+export default class AxiosFunctions{
+
+    getProducts(){
+            return axios.get('https://dummyjson.com/products')
+    }
+    
+    getFilteredProduct(id){
+        return axios.get(`https://dummyjson.com/products/${id}`)
+    }
+
+
+}
+
+Home.js
+
+import React from 'react';
+
+const Home = () => {
+  return (
+    <div style={{ padding: '20px' }}>
+      <h1>Product home page</h1>
+    </div>
+  );
+};
+
+export default Home;
+
+
+NotFound.js
+
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const NotFound = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigate('/');
+    }, 1000); 
+    return () => clearTimeout(timer);
+  }, [navigate]);
+
+  return (
+    <div style={{ textAlign: 'center', paddingTop: '50px' }}>
+      <p>Redirecting to home</p>
+    </div>
+
+  );
+};
+
+export default NotFound;
+
+ProductDetails.js
+
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import AxiosFunctions from '../axiosFunctions/axiosfunctions';
+
+const axiosFunctions = new AxiosFunctions();
+
+const ProductDetails = () => {
+  const { id } = useParams();  
+  const [product, setProduct] = useState(null);
+  useEffect(() => {
+    axiosFunctions.getFilteredProduct(id).then((res) => {
+      setProduct(res.data);
+    });
+  }, [id]);
+
+  if (!product) return <p>Loading</p>; 
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <Link to="/products">Back to Products</Link>
+      <h2>{product.title}</h2>
+      <img src={product.thumbnail} alt={product.title} width={200} />
+      <p><strong>Price:</strong> ${product.price}</p>
+      <p><strong>Description:</strong> {product.description}</p>
+    </div>
+  );
+};
+
+export default ProductDetails;
+
+
+Products.js
+
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import AxiosFunctions from '../axiosFunctions/axiosfunctions';
+
+const axiosFunctions = new AxiosFunctions();
+
+const Products = () => {
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+    axiosFunctions.getProducts().then((res) => {
+      setProducts(res.data.products);
+    });
+  }, []);
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <h1>Products List</h1>
+      {products.map((product) => (
+        <div key={product.id}>
+          <Link to={`/products/${product.id}`} style={{ textDecoration: 'none' }}>
+            <h2>{product.title}</h2>
+            <img src={product.thumbnail} alt={product.title} width={100} />
+          </Link>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default Products;
+
+App.css
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
