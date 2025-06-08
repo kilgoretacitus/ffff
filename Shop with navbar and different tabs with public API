@@ -1,0 +1,231 @@
+App.js 
+
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import Products from './pages/Products';
+import About from './pages/About';
+import Us from './pages/Us';
+import FAQ from './pages/FAQ';
+import Contact from './pages/Contact';
+
+function App() {
+  return (
+    <div>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/us" element={<Us />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+    </div>
+  );
+}
+
+export default App;
+
+
+Navbar.js
+
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+
+const Navbar = () => {
+  return (
+    <nav className="navbar navbar-expand-md navbar-light bg-light">
+      <div className="container-fluid">
+        <NavLink className="navbar-brand" to="/">SHOP</NavLink>
+  
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav ms-auto">
+            <li className="nav-item">
+              <NavLink to="/" end className="nav-link">Home</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/products" className="nav-link">Products</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/about" className="nav-link">About</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/us" className="nav-link">Us</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/faq" className="nav-link">FAQ</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/contact" className="nav-link">Contact</NavLink>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
+
+Products.js
+
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+const Products = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    axios.get('https://dummyjson.com/products')
+      .then(response => {
+        setProducts(response.data.products);
+      })
+      .catch(error => {
+        console.error('Error fetching products:', error);
+      });
+  }, []);
+
+  return (
+    <div className="container py-4">
+      <h1 className="text-center mb-4">Products</h1>
+      <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {products.map(product => (
+          <div key={product.id} className="col">
+            <div className="card h-100 text-center p-3 border-0 rounded-3 shadow-sm">
+              <div className="d-flex justify-content-center">
+                <img
+                  src={product.thumbnail}
+                  alt={product.title}
+                  className="card-img-top rounded-circle"
+                  style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                />
+              </div>
+              <div className="card-body">
+                <h5 className="card-title">{product.title}</h5>
+                <p className="card-text" style={{ fontSize: '0.9rem' }}>{product.description}</p>
+                <p className="fw-bold">${product.price}</p>
+                <button className="btn btn-primary">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Products;
+
+
+About.js
+
+import React from 'react';
+
+const About = () => {
+  return (
+    <div className="container py-5">
+      <h1 className="text-center mb-4">About Us</h1>
+      <p className="lead text-center mb-4">We are a student team selling products</p>
+    </div>
+  );
+};
+
+export default About;
+
+Us.js
+
+import React from 'react';
+
+const Us = () => {
+  return (
+    <div className="container py-5">
+      <div className="d-flex justify-content-center">
+        <div className="text-center">
+          <h1 className="mb-4">CEO</h1>
+          <div>
+            <h3>Aleksandre Sandadze</h3>  
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Us;
+
+Home.js
+
+import React from 'react';
+
+const Home = () => {
+  return (
+    <div className="container py-5">
+      <h1 className="text-center mb-4">UG SHOP</h1>
+      <p className="lead text-center">Homepage of our shop. More information found in other pages.</p>
+    </div>
+  );
+};
+
+export default Home;
+
+Faq.js
+
+import React from 'react';
+
+const FAQ = () => {
+  return (
+    <div className="container py-5">
+      <h1 className="text-center mb-4">Frequently Asked Questions</h1>
+      <div>
+        <h5>Question 1</h5>
+        <p>Answer 1</p>
+      </div>
+      <div>
+        <h5>Question 2</h5>
+        <p>Answer 2</p>
+      </div>
+    </div>
+  );
+};
+
+export default FAQ;
+
+Contact.js
+
+import React from 'react';
+
+const Contact = () => {
+  return (
+    <div className="container py-5">
+      <h1 className="text-center mb-4">Our Contact Information</h1>
+        <div className="mt-4">
+          <h5>Email:</h5>
+          <p>ceo@ug.edu.ge</p>
+        </div>
+
+        <div className="mt-4">
+          <h5>Hotline:</h5>
+          <p>272727</p>
+        </div>
+      </div>
+  );
+};
+
+export default Contact;
+
+
+
